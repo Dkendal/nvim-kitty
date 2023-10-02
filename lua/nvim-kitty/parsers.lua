@@ -124,4 +124,6 @@ function M.parser_for_filetype(filetype)
 	return to_table((parser + line) ^ 0)
 end
 
+-- parser = to_table(mix + line) ^ 0,
+
 return M

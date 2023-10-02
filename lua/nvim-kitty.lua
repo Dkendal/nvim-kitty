@@ -63,38 +63,44 @@ function M.get_text()
 		end
 	end
 
-	local docs = {}
+	local wins = {}
 
 	for idx, win in ipairs(other_windows) do
 		local cmd = format("kitty @ get-text --match id:%s --extent screen", win.id)
 		local text = vim.fn.system(cmd)
-		docs[idx] = text
+
+		vim.print(vim.inspect(win))
+
+		wins[idx] = {
+			text = text,
+			cwd = win.cwd,
+			processes = win.foreground_processes,
+		}
 	end
 
-	return docs
+	return wins
 end
 
 function M.get_diagnostics()
 	local diagnostics = {}
+	local ft = vim.bo.filetype
+	local parser = require("nvim-kitty.parsers").parser_for_filetype(ft)
 
-	for _, doc in ipairs(M.get_text()) do
-		local lines = vim.split(doc, "\n")
+	for _, win in ipairs(M.get_text()) do
+		local matches = parser:match(win.text)
 
-		for _, line in ipairs(lines) do
-			for path, lnum in string.gmatch(line, path_pattern) do
-				if vim.fn.filereadable(path) == 1 then
-					table.insert(diagnostics, {
-						text = line,
-						path = path,
-						lnum = tonumber(lnum),
-						cwd = win.cwd,
-						col = 0,
-					})
-				end
+		for _, match in ipairs(matches) do
+			if vim.fn.filereadable(match.path) == 1 then
+				table.insert(diagnostics, {
+					text = match.text,
+					path = match.path,
+					lnum = match.lnum,
+					cwd = win.cwd,
+					col = match.col or 0,
+				})
 			end
 		end
 	end
-
 	return diagnostics
 end
 
