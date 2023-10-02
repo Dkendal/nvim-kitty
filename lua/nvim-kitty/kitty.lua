@@ -78,25 +78,24 @@ end
 
 function M.get_diagnostics()
 	local diagnostics = {}
+	local ft = vim.bo.filetype
+	local parser = require("nvim-kitty.parsers").parser_for_filetype(ft)
 
-	for _, wins in ipairs(M.get_text()) do
-		local lines = vim.split(wins.text, "\n")
+	for _, win in ipairs(M.get_text()) do
+		local matches = parser:match(win.text)
 
-		for _, line in ipairs(lines) do
-			for path, lnum in string.gmatch(line, path_pattern) do
-				if vim.fn.filereadable(path) == 1 then
-					table.insert(diagnostics, {
-						text = line,
-						path = path,
-						lnum = tonumber(lnum),
-						cwd = wins.cwd,
-						col = 0,
-					})
-				end
+		for _, match in ipairs(matches) do
+			if vim.fn.filereadable(match.path) == 1 then
+				table.insert(diagnostics, {
+					text = match.text,
+					path = match.path,
+					lnum = match.lnum,
+					cwd = win.cwd,
+					col = match.col or 0,
+				})
 			end
 		end
 	end
-
 	return diagnostics
 end
 
