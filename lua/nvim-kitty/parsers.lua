@@ -75,13 +75,29 @@ do
 	mix = mix_compile_error + mix_error + mix_warning
 end
 
+local vimgrep = to_table(
+	tag(capture((any - string(":")) ^ 0), "path")
+		* colon
+		* tag(capture(l.digit ^ 1) / tonumber, "lnum")
+		* colon
+		* tag(capture(l.digit ^ 1) / tonumber, "col")
+		* colon
+		* tag(capture(any ^ 0) / vim.trim, "text")
+		* lf
+)
+
 local parsers = {
 	mix = mix,
+	vimgrep = vimgrep,
 }
 
 local filetypes = {
 	elixir = {
 		mix,
+		vimgrep,
+	},
+	default = {
+		vimgrep,
 	},
 }
 
@@ -93,7 +109,7 @@ function M.parser_for_tool(tool)
 end
 
 function M.parser_for_filetype(filetype)
-	local rules = filetypes[filetype]
+	local rules = filetypes[filetype] or filetypes.default
 
 	local parser = nil
 
@@ -107,7 +123,5 @@ function M.parser_for_filetype(filetype)
 
 	return to_table((parser + line) ^ 0)
 end
-
--- parser = to_table(mix + line) ^ 0,
 
 return M
