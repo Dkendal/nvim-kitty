@@ -7,6 +7,22 @@ local path_pattern = "([^%s:]+%.[^%s:]+):(%d+)"
 
 local pid = vim.fn.getpid()
 
+local function unique_by(tbl, fn)
+	local seen = {}
+	local result = {}
+
+	for _, v in ipairs(tbl) do
+		local key = fn(v)
+
+		if not seen[key] then
+			seen[key] = true
+			table.insert(result, v)
+		end
+	end
+
+	return result
+end
+
 ---@class KittyProcess
 ---@field pid number
 ---@field cmdline string[]
@@ -88,6 +104,7 @@ function M.get_diagnostics()
 			if vim.fn.filereadable(match.path) == 1 then
 				table.insert(diagnostics, {
 					text = match.text,
+					severity = match.severity,
 					path = match.path,
 					lnum = match.lnum,
 					cwd = win.cwd,
@@ -96,7 +113,12 @@ function M.get_diagnostics()
 			end
 		end
 	end
-	return diagnostics
+
+	local out = unique_by(diagnostics, function(v)
+		return v.path .. v.lnum .. v.text
+	end)
+
+	return out
 end
 
 return M

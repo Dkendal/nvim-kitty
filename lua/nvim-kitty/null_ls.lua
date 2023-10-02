@@ -17,18 +17,19 @@ end
 
 M.diagnostics = {
 	method = null_ls.methods.DIAGNOSTICS,
-	filetypes = { "elixir" },
+	filetypes = {},
 	generator = {
 		fn = function(params)
 			local diagnostics = {}
 
 			for _, line in ipairs(kitty.get_diagnostics()) do
+				print(vim.inspect(line))
 				if vim.fn.bufnr(line.path) == params.bufnr then
 					table.insert(diagnostics, {
 						row = line.lnum,
 						source = "kitty",
 						message = "🐱 " .. line.text,
-						severity = severity(line.error_type) or vim.diagnostic.severity.HINT,
+						severity = line.severity or vim.diagnostic.severity.HINT,
 					})
 				end
 			end

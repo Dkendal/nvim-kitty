@@ -16,13 +16,13 @@ local function error_type(str)
 	str = str:lower()
 
 	if str == "error" then
-		return "e"
+		return vim.diagnostic.severity.ERROR
 	elseif str == "warning" then
-		return "w"
+		return vim.diagnostic.severity.WARN
 	elseif str == "info" then
-		return "i"
+		return vim.diagnostic.severity.INFO
 	elseif str == "note" then
-		return "n"
+		return vim.diagnostic.severity.HINT
 	end
 end
 
