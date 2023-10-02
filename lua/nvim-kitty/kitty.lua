@@ -63,22 +63,24 @@ function M.get_text()
 		end
 	end
 
-	local docs = {}
+	local wins = {}
 
 	for idx, win in ipairs(other_windows) do
 		local cmd = format("kitty @ get-text --match id:%s --extent screen", win.id)
 		local text = vim.fn.system(cmd)
-		docs[idx] = text
+		wins[idx] = {}
+		wins[idx].text = text
+		wins[idx].cwd = win.cwd
 	end
 
-	return docs
+	return wins
 end
 
 function M.get_diagnostics()
 	local diagnostics = {}
 
-	for _, doc in ipairs(M.get_text()) do
-		local lines = vim.split(doc, "\n")
+	for _, wins in ipairs(M.get_text()) do
+		local lines = vim.split(wins.text, "\n")
 
 		for _, line in ipairs(lines) do
 			for path, lnum in string.gmatch(line, path_pattern) do
@@ -87,7 +89,7 @@ function M.get_diagnostics()
 						text = line,
 						path = path,
 						lnum = tonumber(lnum),
-						cwd = win.cwd,
+						cwd = wins.cwd,
 						col = 0,
 					})
 				end
@@ -96,16 +98,6 @@ function M.get_diagnostics()
 	end
 
 	return diagnostics
-end
-
-vim.g.nvim_kitty = vim.g.nvim_kitty or {}
-
-if not vim.g.nvim_kitty.loaded then
-	vim.g.nvim_kitty.loaded = true
-
-	vim.api.nvim_create_user_command("KittyPaths", require("nvim-kitty.telescope").finder, {
-		force = true,
-	})
 end
 
 return M

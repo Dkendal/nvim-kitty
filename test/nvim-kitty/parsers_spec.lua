@@ -24,9 +24,7 @@ end)
 
 describe("mix parser", function()
 	it("works", function()
-		local parser = require("nvim-kitty.parsers").parser_for_filetype("elixir")
-
-		print(vim.inspect(parser))
+		local parser = require("nvim-kitty.parsers").parser_for_tool("mix")
 
 		local corpus = here([[
 			Compiling 1 file (.ex)
@@ -91,7 +89,7 @@ describe("mix parser", function()
 				type = "w",
 			},
 			{
-				file_name = "lib/theme_scanner/http.ex",
+				path = "lib/theme_scanner/http.ex",
 				text = "cannot compile module ThemeScanner.Http (errors have been logged)",
 			},
 		}, r)
