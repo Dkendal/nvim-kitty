@@ -30,3 +30,8 @@ globals:
     args:
       - type: any
       - type: any
+
+  assert.equal:
+    args:
+      - type: any
+      - type: any

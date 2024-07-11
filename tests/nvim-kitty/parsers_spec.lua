@@ -1,26 +1,5 @@
+local here = require("test_support").here
 local M = require("nvim-kitty")
-
---- Act like a here document with indentation. The indentation of the first line
---- is the baseline, and all other lines are indented to match. Output string
---- should be trimmed of this baseline indentation.
-local function here(doc)
-	local baseline = string.match(doc, "[^\n]%s*%S")
-	baseline = string.gsub(baseline, "%S", "")
-	--
-	return doc:gsub("^" .. baseline, ""):gsub("\n" .. baseline, "\n"):gsub("%s+\n", "\n"):gsub("%s+$", "\n")
-end
-
-describe("here/1", function()
-	it("works", function()
-		assert.equal(
-			"foo\nbar\n",
-			here([[
-				foo
-				bar
-			]])
-		)
-	end)
-end)
 
 describe("vimgrep parser", function()
 	it("works", function()
