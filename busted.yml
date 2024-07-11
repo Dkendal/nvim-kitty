@@ -1,0 +1,32 @@
+---
+globals:
+  it:
+    args:
+      - type: string
+      - type: function
+
+  describe:
+    args:
+      - type: string
+      - type: function
+
+  after_each:
+    args:
+      - type: function
+
+  before_each:
+    args:
+      - type: function
+
+  assert.is_true:
+    any: true
+
+  assert.are.same:
+    args:
+      - type: any
+      - type: any
+
+  assert.are.equal:
+    args:
+      - type: any
+      - type: any

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+export XDG_CONFIG_HOME="$PWD/.tests/xdg/config/"
+export XDG_STATE_HOME="$PWD/.tests/xdg/local/state/"
+export XDG_DATA_HOME="$PWD/.tests/xdg/local/share/"
+
+nvim --cmd 'set loadplugins' -u ./tests/init.lua "$@"
