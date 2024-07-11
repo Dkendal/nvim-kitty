@@ -14,9 +14,9 @@ describe("vimgrep parser", function()
 
 		local r, l, e = parser:match(corpus)
 
-		assert.equal(nil, l)
-		assert.equal(nil, e)
-		assert.same({
+		assert.are.equal(nil, l)
+		assert.are.equal(nil, e)
+		assert.are.same({
 			{
 				col = 25,
 				lnum = 3,

@@ -21,6 +21,11 @@ globals:
   assert.is_true:
     any: true
 
+  assert.same:
+    args:
+      - type: any
+      - type: any
+
   assert.are.same:
     args:
       - type: any
