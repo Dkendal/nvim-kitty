@@ -6,14 +6,19 @@ M.locale = {}
 
 lpeg.locale(M.locale)
 
+local l = M.locale
+
 M.string = lpeg.P
-M.capture = lpeg.C
 M.set = lpeg.S
 M.range = lpeg.R
-M.tag = lpeg.Cg
+M.capture = lpeg.C
+M.group = lpeg.Cg
+M.pos = lpeg.Cp
+M.sub = lpeg.Cs
+M.match_time = lpeg.Cmt
 M.to_table = lpeg.Ct
 M.linefeed = M.string("\n") + M.string("\r\n")
-M.spc = M.set(" \t") ^ 0
+M.ws = M.set(" \t") ^ 0
 M.tab = M.string("\t")
 
 function M.ignore(p)
@@ -49,17 +54,23 @@ function M.error_type(str)
 		return vim.diagnostic.severity.INFO
 	elseif str == "note" then
 		return vim.diagnostic.severity.HINT
+	elseif str == "hint" then
+		return vim.diagnostic.severity.HINT
 	end
 
 	error("Unknown error type: " .. str)
 end
 
 M.linefeed = M.string("\n") + M.string("\r\n")
-M.spc = M.set(" \t") ^ 0
+M.ws = M.set(" \t") ^ 0
 M.tab = M.string("\t")
 M.char = (1 - M.linefeed)
 M.colon = M.string(":")
-M.path = M.tag(M.capture((M.char - M.string(":")) ^ 0) / vim.trim, "path")
+M.path = M.group(M.capture((M.char - M.string(":")) ^ 0) / vim.trim, "path")
+M.number = M.capture(l.digit ^ 1) / tonumber
+M.lnum = M.group(M.number, "lnum")
+M.col = M.group(M.number, "col")
+M.location = M.path * M.colon * M.lnum * M.colon * M.col
 
 -- Explain:
 -- 1 - lf: match any character except lf

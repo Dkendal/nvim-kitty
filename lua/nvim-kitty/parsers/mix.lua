@@ -4,7 +4,7 @@ lpeg.locale(l)
 
 local string = lpeg.P
 local capture = lpeg.C
-local tag = lpeg.Cg
+local group = lpeg.Cg
 local to_table = lpeg.Ct
 local helper = require("nvim-kitty.parsers.helper")
 local h = require("nvim-kitty.parsers.helper")
@@ -25,46 +25,46 @@ local mix_error_detail = (
 	string("  ")
 	* path
 	* colon
-	* tag(capture(l.digit ^ 1) / tonumber, "lnum")
+	* group(capture(l.digit ^ 1) / tonumber, "lnum")
 	* colon
-	* tag(capture(char ^ 0) / vim.trim, "module")
+	* group(capture(char ^ 0) / vim.trim, "module")
 )
 
 local mix_error = to_table(
-	tag(string("error") / error_type, "severity")
+	group(string("error") / error_type, "severity")
 	* colon
-	* tag(rest_of_line / vim.trim, "text")
+	* group(rest_of_line / vim.trim, "text")
 	* mix_error_detail
 	* linefeed
 )
 
 local mix_warning = to_table(
-	tag(string("warning") / error_type, "severity")
+	group(string("warning") / error_type, "severity")
 	* colon
-	* tag(rest_of_line / vim.trim, "text")
+	* group(rest_of_line / vim.trim, "text")
 	* mix_error_detail
 	* linefeed
 )
 
 local mix_compile_error =
-    to_table(string("** (CompileError) ") * path * colon * tag(capture(char ^ 0) / vim.trim, "text"))
+    to_table(string("** (CompileError) ") * path * colon * group(capture(char ^ 0) / vim.trim, "text"))
 
 local mix_test_stacktrace = h.to_table(
 	h.string("       ")
-	* h.tag((("(" * (h.char - ")") ^ 1 * ")") ^ 0), "module")
+	* h.group((("(" * (h.char - ")") ^ 1 * ")") ^ 0), "module")
 	* h.path
 	* h.colon
-	* h.tag(h.capture(l.digit ^ 1) / tonumber, "lnum")
+	* h.group(h.capture(l.digit ^ 1) / tonumber, "lnum")
 	* h.colon
-	* h.tag(h.capture(char ^ 1) / vim.trim, "text")
+	* h.group(h.capture(char ^ 1) / vim.trim, "text")
 ) / h.set_tag("severity", vim.diagnostic.severity.ERROR)
 
 local indent2 = string("     ")
 
 local mix_test = to_table(
-	    ("  " * tag(capture(text) / vim.trim, "test_name") * linefeed)
-	    * (indent2 * path * colon * tag(capture(repeat1(l.digit)) / tonumber, "lnum") * linefeed)
-	    * (indent2 * tag(capture(take_while_not_followed_by1(string("\n     code:"))) / vim.trim, "text"))
+	    ("  " * group(capture(text) / vim.trim, "test_name") * linefeed)
+	    * (indent2 * path * colon * group(capture(repeat1(l.digit)) / tonumber, "lnum") * linefeed)
+	    * (indent2 * group(capture(take_while_not_followed_by1(string("\n     code:"))) / vim.trim, "text"))
 	    * optional( --
 		    linefeed
 		    * (indent2 * "code:" * rest_of_line)
