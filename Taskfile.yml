@@ -51,6 +51,12 @@ tasks:
 
       git submodule add --force --depth 1 "$url" "$path"
 
+  add:type:
+    vars:
+      URL: "https://github.com/LuaCATS/{{.name}}.git"
+      PATH: "meta/3rd/{{.name}}"
+    cmd: git submodule add --force --depth 1 {{.URL}} {{.PATH}}
+
   install:
     aliases: [i]
     cmd: luarocks install --force --pin --deps-mode=one --tree=lua_modules --only-deps nvim-treeclimber-dev-1.rockspec

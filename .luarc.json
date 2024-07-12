@@ -15,11 +15,13 @@
         ],
         "library": [
             "./lua",
+            "./lua/library",
             "$VIMRUNTIME/lua",
             "meta/3rd/luassert/library",
             "meta/3rd/busted/library",
+            "meta/3rd/lpeg/library",
             "meta/3rd/luv/library",
-            "./.tests/xdg/local/share/nvim/site/pack/testing/start/nvim-treesitter"
+            "./.tests/xdg/local/share/nvim/site/pack/testing/start/*"
         ]
     },
     "diagnostics": {
