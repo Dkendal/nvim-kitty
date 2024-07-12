@@ -41,6 +41,7 @@ function M.take_while_not_followed_by1(p)
 	return (1 - p) ^ 1
 end
 
+--- Convert an error string to a severity level
 --- @param str string
 --- @return integer
 function M.error_type(str)
@@ -66,16 +67,11 @@ M.ws = M.set(" \t") ^ 0
 M.tab = M.string("\t")
 M.char = (1 - M.linefeed)
 M.colon = M.string(":")
-M.path = M.group(M.capture((M.char - M.string(":")) ^ 0) / vim.trim, "path")
+M.path = M.group(M.capture((M.char - M.set(": ")) ^ 1) / vim.trim, "path")
 M.number = M.capture(l.digit ^ 1) / tonumber
 M.lnum = M.group(M.number, "lnum")
 M.col = M.group(M.number, "col")
 M.location = M.path * M.colon * M.lnum * M.colon * M.col
-
--- Explain:
--- 1 - lf: match any character except lf
--- ^0: match zero or more times
--- lf: match line feed
 M.rest_of_line = M.char ^ 0 * M.linefeed
 M.text = M.char ^ 1
 

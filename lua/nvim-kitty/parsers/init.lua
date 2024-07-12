@@ -3,27 +3,24 @@ local to_table = lpeg.Ct
 local helper = require("nvim-kitty.parsers.helper")
 local rest_of_line = helper.rest_of_line
 
-local vimgrep = require("nvim-kitty.parsers.vimgrep")
-local mix = require("nvim-kitty.parsers.mix")
-local cargo = require("nvim-kitty.parsers.cargo")
-
 local parsers = {
-	mix = mix,
-	vimgrep = vimgrep,
-	cargo = cargo,
+	vimgrep = require("nvim-kitty.parsers.vimgrep"),
+	mix = require("nvim-kitty.parsers.mix"),
+	cargo = require("nvim-kitty.parsers.cargo"),
+	generic = require("nvim-kitty.parsers.generic"),
 }
 
 local filetypes = {
 	elixir = {
-		mix,
-		vimgrep,
+		parsers.mix,
+		parsers.vimgrep,
 	},
 	rust = {
-		cargo,
+		parsers.cargo,
 	},
 	default = {
-		mix,
-		vimgrep,
+		parsers.vimgrep,
+		parsers.generic,
 	},
 }
 
