@@ -44,7 +44,6 @@ function M.finder(opts)
 		}
 	end
 
-	vim.print(vim.inspect(opts))
 	pickers
 			.new(opts, {
 				prompt_title = "Kitty 🐱 - Paths",

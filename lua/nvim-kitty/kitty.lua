@@ -84,12 +84,45 @@ function M.get_text()
 	for idx, win in ipairs(other_windows) do
 		local cmd = format("kitty @ get-text --match id:%s --extent screen", win.id)
 		local text = vim.fn.system(cmd)
-		wins[idx] = {}
-		wins[idx].text = text
-		wins[idx].cwd = win.cwd
+
+		local w = {}
+		w.text = text
+
+		if #win.foreground_processes > 0 then
+			w.cwd = win.foreground_processes[1].cwd
+		else
+			w.cwd = win.cwd
+		end
+
+		wins[idx] = w
 	end
 
 	return wins
+end
+
+function M.get_diagnostics_for_text(parser, cwd, text)
+	local diagnostics = {}
+
+	local matches = parser:match(text)
+
+	for _, match in ipairs(matches) do
+		if vim.fn.filereadable(cwd .. "/" .. match.path) == 1 then
+			table.insert(diagnostics, {
+				text = match.text,
+				severity = match.severity,
+				path = match.path,
+				lnum = match.lnum or 0,
+				cwd = cwd,
+				col = match.col or 0,
+			})
+		end
+	end
+
+	local out = unique_by(diagnostics, function(v)
+		return v.path .. v.lnum .. v.text
+	end)
+
+	return out
 end
 
 function M.get_diagnostics()
@@ -98,13 +131,16 @@ function M.get_diagnostics()
 	local parser = require("nvim-kitty.parsers").parser_for_filetype(ft)
 
 	for _, win in ipairs(M.get_text()) do
+		vim.print(vim.inspect(win))
 		local matches = parser:match(win.text)
 
 		for _, match in ipairs(matches) do
-			if vim.fn.filereadable(win.cwd .. "/" .. match.path) == 1 then
+			local path = win.cwd .. "/" .. match.path
+
+			if vim.fn.filereadable(path) == 1 then
 				table.insert(diagnostics, {
-					text = match.text,
-					severity = match.severity,
+					text = match.text or "",
+					severity = match.severity or vim.diagnostic.severity.ERROR,
 					path = match.path,
 					lnum = match.lnum or 0,
 					cwd = win.cwd,
@@ -131,9 +167,23 @@ function M.pretty_print()
 		local matches = parser:match(win.text)
 		table.insert(out, {
 			cwd = win.cwd,
-			matches = matches
+			matches = matches,
 		})
 	end
+
+	vim.print(vim.inspect(out))
+end
+
+function M.info()
+	local ft = vim.bo.filetype
+	local filetypes = require("nvim-kitty.parsers").filetypes
+
+	local parsers = filetypes[ft] or filetypes.default
+
+	local out = {
+		ft = ft,
+		parsers = parsers,
+	}
 
 	vim.print(vim.inspect(out))
 end

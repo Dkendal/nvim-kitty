@@ -1,8 +1,8 @@
-local here = require("test_support").here
+local t = require("test_support")
 local parser = require("nvim-kitty.parsers").wrap(require("nvim-kitty.parsers.cargo"))
 
 it("processes cargo errors", function()
-	local corpus = here([[
+	local corpus = t.here([[
 			error[E0308]: mismatched types
 				 --> src/parser.rs:716:21
 					|
@@ -31,7 +31,7 @@ it("processes cargo errors", function()
 end)
 
 it("processes cargo warnings", function()
-	local corpus = here([[
+	local corpus = t.here([[
 		warning: unreachable pattern
 				--> src/ast.rs:1147:13
 				 |

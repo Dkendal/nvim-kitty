@@ -12,19 +12,21 @@ local parsers = {
 
 local filetypes = {
 	elixir = {
-		parsers.mix,
-		parsers.vimgrep,
+		mix = parsers.mix,
+		vimgrep = parsers.vimgrep,
 	},
 	rust = {
-		parsers.cargo,
+		cargo = parsers.cargo,
 	},
 	default = {
-		parsers.vimgrep,
-		parsers.generic,
+		vimgrep = parsers.vimgrep,
+		generic = parsers.generic,
 	},
 }
 
 local M = {}
+
+M.filetypes = filetypes
 
 ---@param tool string
 ---@return table
@@ -40,7 +42,7 @@ function M.parser_for_filetype(filetype)
 
 	local parser = nil
 
-	for _, rule in ipairs(rules) do
+	for _, rule in pairs(rules) do
 		if parser == nil then
 			parser = rule
 		else
