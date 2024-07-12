@@ -46,7 +46,7 @@ function M.parser_for_filetype(filetype)
 		end
 	end
 
-	return wrap(parser)
+	return M.wrap(parser)
 end
 
 ---@param parser table
