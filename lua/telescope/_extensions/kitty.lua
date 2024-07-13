@@ -1,8 +1,8 @@
-return require("telescope").register_extension {
+return require("telescope").register_extension({
   setup = function(ext_config, config)
     -- access extension config and user config
   end,
   exports = {
-    files = require("nvim-kitty.telescope").finder
+    kitty = require("nvim-kitty.telescope").finder,
   },
-}
+})
