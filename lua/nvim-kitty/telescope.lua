@@ -3,6 +3,24 @@ local format = string.format
 
 local M = {}
 
+local function severity_to_text(severity)
+	if severity == vim.diagnostic.severity.ERROR then
+		return { "E", "DiagnosticError" }
+	elseif severity == vim.diagnostic.severity.WARN then
+		return { "W", "DiagnosticWarn" }
+	elseif severity == vim.diagnostic.severity.INFO then
+		return { "I", "DiagnosticInfo" }
+	elseif severity == vim.diagnostic.severity.HINT then
+		return { "H", "DiagnosticHint" }
+	end
+
+	return { "?", "DiagnosticOk" }
+end
+
+local function format_ordinal(entry)
+	return format("%s/%s:%s", entry.cwd, entry.path, entry.lnum)
+end
+
 function M.finder(opts)
 	opts = opts or {}
 
@@ -15,31 +33,41 @@ function M.finder(opts)
 	local themes = require("telescope.themes")
 	local conf = require("telescope.config").values
 	local sorters = require("telescope.sorters")
+	local entry_display = require("telescope.pickers.entry_display")
 
-	local entry_maker = function(diagnostic)
+	local path_width = 0
+
+	for _, diagnostic in ipairs(diagnostics) do
+		path_width = math.max(path_width, #diagnostic.path)
+	end
+
+	local displayer = entry_display.create({
+		separator = " ",
+		items = {
+			{ width = 1 },
+			{ width = path_width },
+			{ remaining = true },
+		},
+	})
+
+	local function make_display(entry)
+		return displayer({
+			severity_to_text(entry.value.severity),
+			{ entry.value.path, "Comment" },
+			entry.value.text,
+		})
+	end
+
+	local function entry_maker(diagnostic)
 		local path = format("%s/%s", diagnostic.cwd, diagnostic.path)
-		local str = format("%s:%s", path, diagnostic.lnum)
-
-		local severity = diagnostic.severity
-		if severity == vim.diagnostic.severity.ERROR then
-			severity = "E"
-		elseif severity == vim.diagnostic.severity.WARN then
-			severity = "W"
-		elseif severity == vim.diagnostic.severity.INFO then
-			severity = "I"
-		elseif severity == vim.diagnostic.severity.HINT then
-			severity = "H"
-		else
-			severity = "E"
-		end
-
-		local display = format("[%s] %s:%d: %s", severity, diagnostic.path, diagnostic.lnum, diagnostic.text)
+		local ordinal = format_ordinal(diagnostic)
 
 		return {
 			value = diagnostic,
-			display = display,
-			ordinal = str,
-			path = format("%s/%s", diagnostic.cwd, diagnostic.path),
+			display = make_display,
+			ordinal = ordinal,
+			text = diagnostic.text,
+			path = path,
 			lnum = diagnostic.lnum,
 		}
 	end
