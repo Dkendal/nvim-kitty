@@ -28,7 +28,7 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ```lua
 -- init.lua:
-reuqire('lazy').setup({
+require('lazy').setup({
     -- ...
     {
         'dkendal/nvim-kitty',
