@@ -16,7 +16,7 @@ local error_type = helper.error_type
 local set_tag = helper.set_tag
 local text = helper.text
 local repeat1 = helper.repeat1
-local take_while_not_followed_by1 = helper.take_while_not_followed_by1
+local while_not1 = helper.while_not1
 local optional = helper.optional
 local flatten = helper.flatten
 

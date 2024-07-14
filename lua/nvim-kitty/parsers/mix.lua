@@ -17,7 +17,7 @@ local error_type = helper.error_type
 local set_tag = helper.set_tag
 local text = helper.text
 local repeat1 = helper.repeat1
-local take_while_not_followed_by1 = helper.take_while_not_followed_by1
+local while_not1 = helper.while_not1
 local optional = helper.optional
 local flatten = helper.flatten
 
@@ -64,7 +64,7 @@ local indent2 = string("     ")
 local mix_test = to_table(
 	    ("  " * group(capture(text) / vim.trim, "test_name") * linefeed)
 	    * (indent2 * path * colon * group(capture(repeat1(l.digit)) / tonumber, "lnum") * linefeed)
-	    * (indent2 * group(capture(take_while_not_followed_by1(string("\n     code:"))) / vim.trim, "text"))
+	    * (indent2 * group(capture(while_not1(string("\n     code:"))) / vim.trim, "text"))
 	    * optional( --
 		    linefeed
 		    * (indent2 * "code:" * rest_of_line)

@@ -18,8 +18,11 @@ M.sub = lpeg.Cs
 M.match_time = lpeg.Cmt
 M.to_table = lpeg.Ct
 M.linefeed = M.string("\n") + M.string("\r\n")
-M.ws = M.set(" \t") ^ 0
+M.ws = M.set(" \t\r\n") ^ 0
+M.ws_ = M.set(" \t") ^ 0
 M.tab = M.string("\t")
+M.quote = M.string([[']])
+M.dquote = M.string([["]])
 
 function M.ignore(p)
 	return M.capture(p) / ""
@@ -37,7 +40,7 @@ function M.repeat0(p)
 	return p ^ 0
 end
 
-function M.take_while_not_followed_by1(p)
+function M.while_not1(p)
 	return (1 - p) ^ 1
 end
 

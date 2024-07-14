@@ -56,3 +56,25 @@ it("processes cargo warnings", function()
 		},
 	}, r)
 end)
+
+it("processes todo panics", function()
+	local corpus = t.here([[
+		thread 'parser::parser_tests::object_literal::index' panicked at src/parser.rs:708:25:
+		not yet implemented
+		note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+	]])
+
+	local r, l, e = parser:match(corpus)
+
+	assert.equal(nil, l)
+	assert.equal(nil, e)
+	assert.same({
+		{
+			col = 25,
+			lnum = 708,
+			path = "src/parser.rs",
+			severity = vim.diagnostic.severity.ERROR,
+			text = "not yet implemented",
+		},
+	}, r)
+end)
