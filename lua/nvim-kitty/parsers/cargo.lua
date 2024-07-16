@@ -28,4 +28,20 @@ local text = h.group(h.rest_of_line / vim.trim, "text")
 local rust_panic_parser = h.to_table(thread_info * location * h.ws * h.colon * h.rest_of_line * text)
 		/ h.set_tag("severity", vim.diagnostic.severity.ERROR)
 
-return cargo_parser + rust_panic_parser
+local entry_number = h.ws * h.group(h.capture(h.number), "stack_number") * h.string(":") * h.ws
+
+local function_name = h.group(h.rest_of_line, "text")
+
+local path_info = h.ws * h.string("at") * h.ws * h.location * h.rest_of_line
+
+local single_entry = h.to_table(entry_number * function_name * path_info)
+		/ function(entry)
+			return vim.tbl_extend("force", entry, {
+				severity = vim.diagnostic.severity.ERROR,
+				text = string.format("%s: %s", entry.stack_number, entry.text),
+			})
+		end
+
+local rust_backtrace_parser = h.to_table(h.string("stack backtrace:") * h.linefeed * h.repeat1(single_entry)) / unpack
+
+return cargo_parser + rust_panic_parser + rust_backtrace_parser

@@ -38,7 +38,8 @@ function M.finder(opts)
 	local path_width = 0
 
 	for _, diagnostic in ipairs(diagnostics) do
-		path_width = math.max(path_width, #diagnostic.path)
+		diagnostic.display_path = format("%s:%s:%s", diagnostic.path, diagnostic.lnum, diagnostic.col)
+		path_width = math.max(path_width, #diagnostic.display_path)
 	end
 
 	local displayer = entry_display.create({
@@ -53,7 +54,7 @@ function M.finder(opts)
 	local function make_display(entry)
 		return displayer({
 			severity_to_text(entry.value.severity),
-			{ entry.value.path, "Comment" },
+			{ entry.value.display_path, "Comment" },
 			entry.value.text,
 		})
 	end
