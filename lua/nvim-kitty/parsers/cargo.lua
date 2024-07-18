@@ -44,4 +44,13 @@ local single_entry = h.to_table(entry_number * function_name * path_info)
 
 local rust_backtrace_parser = h.to_table(h.string("stack backtrace:") * h.linefeed * h.repeat1(single_entry)) / unpack
 
-return cargo_parser + rust_panic_parser + rust_backtrace_parser
+local dbg_parser = h.to_table(
+	h.string("[")
+	* h.location
+	* h.string("]")
+	* h.group(h.while_not1(h.string("=")) / vim.trim / function(t)
+		return "dbg: " .. t
+	end, "text")
+) / h.set_tag("severity", vim.diagnostic.severity.INFO)
+
+return cargo_parser + rust_panic_parser + rust_backtrace_parser + dbg_parser
