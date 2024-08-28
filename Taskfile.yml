@@ -2,6 +2,16 @@
 
 version: "3"
 
+vars:
+  rockspec: ./nvim-kitty-dev-2.rockspec
+
+env:
+  LUAROCKS_PREFIX: "{{.ROOT_DIR}}/lua_modules"
+  LUA_PATH: "$LUAROCKS_PREFIX/share/lua/5.1/?.lua;$LUAROCKS_PREFIX/share/lua/5.1/?/init.lua;$LUA_PATH"
+  LUA_CPATH: "$LUAROCKS_PREFIX/lib/lua/5.1/?.so;$LUA_CPATH"
+  LUAROCKS_CONFIG: "{{.ROOT_DIR}}/config.lua"
+  PATH: "$LUAROCKS_PREFIX/bin:$PATH"
+
 tasks:
   default:
     - task: test
@@ -59,11 +69,11 @@ tasks:
 
   install:
     aliases: [i]
-    cmd: luarocks install --force --pin --deps-mode=one --tree=lua_modules --only-deps nvim-treeclimber-dev-1.rockspec
+    cmd: luarocks install --force --pin --deps-mode=one --tree=lua_modules --only-deps {{.rockspec}}
 
   install:test:
     aliases: [it]
-    cmd: luarocks --tree=lua_modules test --prepare ./nvim-treeclimber-dev-1.rockspec
+    cmd: luarocks --tree=lua_modules test --prepare {{.rockspec}}
 
   lint:
     cmd: selene .

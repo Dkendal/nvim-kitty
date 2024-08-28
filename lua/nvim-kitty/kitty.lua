@@ -1,11 +1,6 @@
 local M = {}
 
-local a = require("nvim-kitty.async")
 local format = string.format
-
-local path_pattern = "([^%s:]+%.[^%s:]+):(%d+)"
-
-local pid = vim.fn.getpid()
 
 local function unique_by(tbl, fn)
 	local seen = {}
@@ -131,22 +126,65 @@ function M.get_diagnostics()
 	local parser = require("nvim-kitty.parsers").parser_for_filetype(ft)
 
 	for _, win in ipairs(M.get_text()) do
-		vim.print(vim.inspect(win))
 		local matches = parser:match(win.text)
 
 		for _, match in ipairs(matches) do
-			local path = win.cwd .. "/" .. match.path
+			assert(type(match) == "table", "Match must be a table")
+			assert(type(match.path) == "string", "Match.path must be a string")
+			assert(type(match.text or "") == "string", "Match.text must be a string")
+			assert(type(match.lnum or 0) == "number", "Match.lnum must be a number")
+			assert(type(match.col or 0) == "number", "Match.col must be a number")
+			assert(type(match.severity or vim.diagnostic.severity.ERROR) == "number", "Match.severity must be a number")
+			vim.print(vim.inspect(match.path))
 
-			if vim.fn.filereadable(path) == 1 then
-				table.insert(diagnostics, {
-					text = match.text or "",
-					severity = match.severity or vim.diagnostic.severity.ERROR,
-					path = match.path,
-					lnum = match.lnum or 0,
-					cwd = win.cwd,
-					col = match.col or 0,
-				})
+			local path = match.path
+
+			if path == nil then
+				path = ""
 			end
+
+			if vim.fn.filereadable(path) ~= 1 then
+				path = win.cwd .. "/" .. path
+
+				if vim.fn.filereadable(path) ~= 1 then
+					goto continue
+				end
+			end
+
+			table.insert(diagnostics, {
+				text = match.text or "",
+				severity = match.severity or vim.diagnostic.severity.ERROR,
+				path = path,
+				lnum = match.lnum or 0,
+				cwd = win.cwd,
+				col = match.col or 0,
+			})
+
+			::continue::
+		end
+	end
+
+	local out = unique_by(diagnostics, function(v)
+		return v.path .. v.lnum .. v.text
+	end)
+
+	return out
+end
+
+function M.get_diagnostics_for_parser(parser)
+	local diagnostics = {}
+	for _, win in ipairs(M.get_text()) do
+		local matches = parser:match(win.text)
+
+		for _, match in ipairs(matches) do
+			table.insert(diagnostics, {
+				text = match.text or "",
+				severity = match.severity or vim.diagnostic.severity.ERROR,
+				path = match.path,
+				lnum = match.lnum or 0,
+				cwd = win.cwd,
+				col = match.col or 0,
+			})
 		end
 	end
 

@@ -8,9 +8,16 @@ local parsers = {
 	mix = require("nvim-kitty.parsers.mix"),
 	cargo = require("nvim-kitty.parsers.cargo"),
 	generic = require("nvim-kitty.parsers.generic"),
+	nodejs = require("nvim-kitty.parsers.nodejs"),
 }
 
 local filetypes = {
+	javascript = {
+		nodejs = parsers.nodejs,
+	},
+	typescript = {
+		nodejs = parsers.nodejs,
+	},
 	elixir = {
 		mix = parsers.mix,
 		vimgrep = parsers.vimgrep,

@@ -24,23 +24,38 @@ M.tab = M.string("\t")
 M.quote = M.string([[']])
 M.dquote = M.string([["]])
 
+---@param p Pattern
+---@return Pattern
 function M.ignore(p)
+	assert(p ~= nil, "Pattern cannot be nil")
 	return M.capture(p) / ""
 end
 
+---@param p Pattern
+---@return Pattern
 function M.optional(p)
+	assert(p ~= nil, "Pattern cannot be nil")
 	return p ^ -1
 end
 
+---@param p Pattern
+---@return Pattern
 function M.repeat1(p)
+	assert(p ~= nil, "Pattern cannot be nil")
 	return p ^ 1
 end
 
+---@param p Pattern
+---@return Pattern
 function M.repeat0(p)
+	assert(p ~= nil, "Pattern cannot be nil")
 	return p ^ 0
 end
 
+---@param p Pattern
+---@return Pattern
 function M.while_not1(p)
+	assert(p ~= nil, "Pattern cannot be nil")
 	return (1 - p) ^ 1
 end
 
