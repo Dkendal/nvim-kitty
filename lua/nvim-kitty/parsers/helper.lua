@@ -24,23 +24,40 @@ M.tab = M.string("\t")
 M.quote = M.string([[']])
 M.dquote = M.string([["]])
 
+function M.dbg(t)
+	vim.print(vim.inspect(t))
+	return t
+end
+
+local function cast_string(p)
+	if type(p) == "string" then
+		p = M.string(p)
+	end
+	return p
+end
+
 function M.ignore(p)
+	p = cast_string(p)
 	return M.capture(p) / ""
 end
 
 function M.optional(p)
+	p = cast_string(p)
 	return p ^ -1
 end
 
 function M.repeat1(p)
+	p = cast_string(p)
 	return p ^ 1
 end
 
 function M.repeat0(p)
+	p = cast_string(p)
 	return p ^ 0
 end
 
 function M.while_not1(p)
+	p = cast_string(p)
 	return (1 - p) ^ 1
 end
 
@@ -70,7 +87,21 @@ M.ws = M.set(" \t") ^ 0
 M.tab = M.string("\t")
 M.char = (1 - M.linefeed)
 M.colon = M.string(":")
-M.path = M.group(M.capture((M.char - M.set(": ")) ^ 1) / vim.trim, "path")
+
+-- Path components
+local slash = M.string("/")
+local dot = M.string(".")
+local dotdot = M.string("..")
+local name = (M.range("az", "AZ") + M.range("09") + M.set("_-")) ^ 1
+local extension = dot * name
+
+-- Path pattern
+local dir = ((dot + dotdot + name) * slash)
+local filename = name * extension
+local path = slash ^ -1 * dir ^ 0 * filename
+
+M.path = M.group(M.capture(path) / vim.trim, "path")
+
 M.number = M.capture(l.digit ^ 1) / tonumber
 M.lnum = M.group(M.number, "lnum")
 M.col = M.group(M.number, "col")

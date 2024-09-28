@@ -31,5 +31,4 @@ local flatten = helper.flatten
 -- 	* linefeed
 -- )
 
-
 return parser

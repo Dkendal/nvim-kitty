@@ -10,3 +10,4 @@
 /.tmp
 /check.json
 *.log
+**/.DS_Store

@@ -57,7 +57,6 @@ it("can extract paths at the start of a line", function()
 	}, r)
 end)
 
-
 it("can extract paths at the end of a line", function()
 	local corpus = here([[
 			abc abc src/parser.rs:716:21

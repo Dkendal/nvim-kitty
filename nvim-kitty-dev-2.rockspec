@@ -15,6 +15,9 @@ build = {
    modules = {},
    copy_directories = {}
 }
+dependencies = {
+   "lpeglabel ~> 1.6.2",
+}
 test_dependencies = {
    "lua == 5.1",
    "busted ~> 2.2.0",

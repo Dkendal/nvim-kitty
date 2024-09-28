@@ -2,9 +2,18 @@
 
 version: "3"
 
+vars:
+  rockspec: nvim-kitty-dev-2.rockspec
+
 tasks:
   default:
     - task: test
+
+  compile:
+    aliases: [c]
+    sources: ["fnl/**/*.fnl"]
+    generates: ["lua/**/*.lua"]
+    cmd: make
 
   test:
     silent: true
@@ -59,11 +68,16 @@ tasks:
 
   install:
     aliases: [i]
-    cmd: luarocks install --force --pin --deps-mode=one --tree=lua_modules --only-deps nvim-treeclimber-dev-1.rockspec
+    cmds:
+      - git submodule update --init --recursive
+      - luarocks install --force --pin --deps-mode=one --tree=lua_modules --only-deps {{.rockspec}}
 
   install:test:
     aliases: [it]
-    cmd: luarocks --tree=lua_modules test --prepare ./nvim-treeclimber-dev-1.rockspec
+    cmd: luarocks --tree=lua_modules test --prepare {{.rockspec}} 
+
+  format:
+    cmd: stylua --syntax Lua51 .
 
   lint:
     cmd: selene .

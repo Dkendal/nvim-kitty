@@ -1,11 +1,6 @@
 local M = {}
 
-local a = require("nvim-kitty.async")
 local format = string.format
-
-local path_pattern = "([^%s:]+%.[^%s:]+):(%d+)"
-
-local pid = vim.fn.getpid()
 
 local function unique_by(tbl, fn)
 	local seen = {}
@@ -131,22 +126,19 @@ function M.get_diagnostics()
 	local parser = require("nvim-kitty.parsers").parser_for_filetype(ft)
 
 	for _, win in ipairs(M.get_text()) do
-		vim.print(vim.inspect(win))
 		local matches = parser:match(win.text)
 
 		for _, match in ipairs(matches) do
-			local path = win.cwd .. "/" .. match.path
+			local entry = {
+				text = match.text or "",
+				severity = match.severity or vim.diagnostic.severity.ERROR,
+				path = match.path,
+				lnum = match.lnum or 0,
+				cwd = win.cwd,
+				col = match.col or 0,
+			}
 
-			if vim.fn.filereadable(path) == 1 then
-				table.insert(diagnostics, {
-					text = match.text or "",
-					severity = match.severity or vim.diagnostic.severity.ERROR,
-					path = match.path,
-					lnum = match.lnum or 0,
-					cwd = win.cwd,
-					col = match.col or 0,
-				})
-			end
+			table.insert(diagnostics, entry)
 		end
 	end
 

@@ -91,4 +91,83 @@ describe("mix parser", function()
 			},
 		}, r)
 	end)
+
+	it("can match a line from a stacktrace", function()
+		local parser = require("nvim-kitty.parsers").parser_for_tool("mix")
+
+		local corpus = here([[
+					 (elixir 1.16.3) lib/keyword.ex:599: Keyword.fetch!/2
+					 (app 1.0.0) lib/app/module/interface.ex:224: App.Module.Data.to_param/3
+					 test/app/module/name_test.exs:26: (test)
+		]])
+
+		local r, l, e = parser:match(corpus)
+
+		assert.equal(nil, l)
+		assert.equal(nil, e)
+		assert.same({
+			{
+				path = "lib/keyword.ex",
+				module = "elixir",
+				lnum = 599,
+				text = "Keyword.fetch!/2",
+			},
+			{
+				path = "lib/app/module/interface.ex",
+				module = "app",
+				lnum = 224,
+				text = "App.Module.Data.to_param/3",
+			},
+			{
+				path = "test/app/module/name_test.exs",
+				lnum = 26,
+				test_name = "(test)",
+			},
+		}, r)
+	end)
+
+	pending("matches lines to umbrella apps", function()
+		local parser = require("nvim-kitty.parsers").parser_for_tool("mix")
+
+		local corpus = here([[
+			1) test text (Module.Name)
+				 apps/app/test/app/module/name_test.exs:18
+				 ** (KeyError) error
+				 code: {:ok, %{}} = error
+				 stacktrace:
+					 (elixir 1.16.3) lib/keyword.ex:599: Keyword.fetch!/2
+					 (app 1.0.0) lib/app/module/interface.ex:224: App.Module.Data.to_param/3
+					 test/app/module/name_test.exs:26: (test)
+		]])
+
+		local r, l, e = parser:match(corpus)
+
+		assert.equal(nil, l)
+		assert.equal(nil, e)
+		assert.same({
+			{
+				path = "apps/app/test/app/module/name_test.exs",
+				lnum = 18,
+				test_name = "test text (Module.Name)",
+				test_number = "1",
+				text = "** (KeyError) error",
+				code = "{:ok, %{}} = error",
+			},
+			{
+				path = "(elixir 1.16.3) lib/keyword.ex",
+				lnum = 599,
+				text = "Keyword.fetch!/2",
+			},
+			{
+				path = "(app 1.0.0) lib/app/module/interface.ex",
+				lnum = 224,
+				text = "App.Module.Data.to_param/3",
+			},
+			{
+				path = "test/app/module/name_test.exs",
+				lnum = 26,
+				test_name = "(test)",
+			},
+		}, r)
+	end)
 end)

@@ -60,7 +60,14 @@ function M.finder(opts)
 	end
 
 	local function entry_maker(diagnostic)
-		local path = format("%s/%s", diagnostic.cwd, diagnostic.path)
+		local path = ""
+
+		if vim.startswith(diagnostic.path, "/") then
+			path = format("%s/%s", diagnostic.cwd, diagnostic.path)
+		else
+			path = diagnostic.path
+		end
+
 		local ordinal = format_ordinal(diagnostic)
 
 		return {
@@ -74,16 +81,16 @@ function M.finder(opts)
 	end
 
 	pickers
-			.new(opts, {
-				prompt_title = "Kitty 🐱 - Paths",
-				finder = finders.new_table({
-					results = diagnostics,
-					entry_maker = entry_maker,
-				}),
-				sorter = sorters.highlighter_only(opts),
-				previewer = conf.grep_previewer(opts),
-			})
-			:find()
+		.new(opts, {
+			prompt_title = "Kitty 🐱 - Paths",
+			finder = finders.new_table({
+				results = diagnostics,
+				entry_maker = entry_maker,
+			}),
+			sorter = sorters.highlighter_only(opts),
+			previewer = conf.grep_previewer(opts),
+		})
+		:find()
 end
 
 return M
